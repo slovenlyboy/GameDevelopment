@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "Game.h"
 
+
 extern void ExitGame();
 
 using namespace DirectX;
@@ -36,6 +37,9 @@ void Game::Initialize(HWND window, int width, int height)
     m_timer.SetFixedTimeStep(true);
     m_timer.SetTargetElapsedSeconds(1.0 / 60);
     */
+
+	m_spriteBatch = std::make_unique<SpriteBatch>(m_d3dContext.Get());
+	m_spriteFont = std::make_unique<SpriteFont>(m_d3dDevice.Get(), L"Resources/myfile.spritefont");
 }
 
 // Executes the basic game loop.
@@ -54,7 +58,7 @@ void Game::Update(DX::StepTimer const& timer)
 {
     float elapsedTime = float(timer.GetElapsedSeconds());
 
-    // TODO: Add your game logic here.
+    // TODO: Add your game logic here
     elapsedTime;
 }
 
@@ -70,6 +74,13 @@ void Game::Render()
     Clear();
 
     // TODO: Add your rendering code here.
+
+	m_spriteBatch->Begin();
+	m_spriteFont->DrawString(m_spriteBatch.get(),
+		L"Hello, world!", XMFLOAT2(100, 100));
+	m_spriteBatch->End();
+
+
 
     Present();
 }

@@ -5,7 +5,9 @@
 #pragma once
 
 #include "StepTimer.h"
-
+#include <SpriteFont.h>
+#include <SpriteBatch.h>
+#include <SStream>
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
@@ -62,4 +64,10 @@ private:
 
     // Rendering loop timer.
     DX::StepTimer                                   m_timer;
+
+	//スプライトバッチ
+	std::unique_ptr<DirectX::SpriteBatch> m_spriteBatch;
+	//スプライトフォント
+	std::unique_ptr<DirectX::SpriteFont> m_spriteFont;
+
 };
