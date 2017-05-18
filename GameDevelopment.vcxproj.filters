@@ -10,11 +10,16 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="StepTimer.h" />
+    <ClInclude Include="ADX2Le.h" />
+    <ClInclude Include="CueSheet_0.h" />
+    <ClInclude Include="JoyPad.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="ADX2Le.cpp" />
+    <ClCompile Include="JoyPad.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
@@ -28,5 +33,13 @@
     <Manifest Include="settings.manifest">
       <Filter>Assets</Filter>
     </Manifest>
+  </ItemGroup>
+  <ItemGroup>
+    <ImageContentTask Include="Assets\hqdefault.jpg">
+      <Filter>Assets</Filter>
+    </ImageContentTask>
+    <ImageContentTask Include="Assets\images.jpg">
+      <Filter>Assets</Filter>
+    </ImageContentTask>
   </ItemGroup>
 </Project>

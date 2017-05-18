@@ -4,6 +4,13 @@
 
 #include "pch.h"
 #include "Game.h"
+#include "ADX2Le.h"
+#include "CueSheet_0.h"
+
+#include <DDSTextureLoader.h>
+#include<WICTextureLoader.h>
+#include <SimpleMath.h>
+
 
 
 extern void ExitGame();
@@ -23,6 +30,11 @@ Game::Game() :
 // Initialize the Direct3D resources required to run.
 void Game::Initialize(HWND window, int width, int height)
 {
+	ADX2Le::Initialize("Resources\\Sounds\\Sounds.acf");
+	ADX2Le::LoadAcb("Resources\\Sounds\\CueSheet_0.acb");
+
+
+
     m_window = window;
     m_outputWidth = std::max(width, 1);
     m_outputHeight = std::max(height, 1);
@@ -31,6 +43,26 @@ void Game::Initialize(HWND window, int width, int height)
 
     CreateResources();
 
+
+
+
+	Microsoft::WRL::ComPtr<ID3D11Resource> resource;
+
+	m_spriteBatch = std::make_unique<SpriteBatch>(m_d3dContext.Get());
+	m_spriteFont = std::make_unique<SpriteFont>(m_d3dDevice.Get(), L"Resources/myfile.spritefont");
+
+
+
+	DX::ThrowIfFailed(
+		CreateDDSTextureFromFile(m_d3dDevice.Get(), L"Resources/images.dds", resource.GetAddressOf(),
+			m_texture1.ReleaseAndGetAddressOf()));
+
+	DX::ThrowIfFailed(
+		CreateDDSTextureFromFile(m_d3dDevice.Get(), L"Resources/hqdefault.dds", resource.GetAddressOf(),
+			m_texture2.ReleaseAndGetAddressOf()));
+
+
+
     // TODO: Change the timer settings if you want something other than the default variable timestep mode.
     // e.g. for 60 FPS fixed timestep update logic, call:
     /*
@@ -38,8 +70,22 @@ void Game::Initialize(HWND window, int width, int height)
     m_timer.SetTargetElapsedSeconds(1.0 / 60);
     */
 
-	m_spriteBatch = std::make_unique<SpriteBatch>(m_d3dContext.Get());
-	m_spriteFont = std::make_unique<SpriteFont>(m_d3dDevice.Get(), L"Resources/myfile.spritefont");
+	
+	gamepad = std::make_unique<GamePad>();
+	
+
+	auto state = gamepad->GetState(0);
+
+	if (state.IsConnected())
+	{
+	
+	}
+	//ADX2Le::Play(TOWER_BGM);
+
+
+	m_pJoyPad = std::make_unique<JoyPad>();
+	m_pJoyPad->Initialize(window);
+
 }
 
 // Executes the basic game loop.
@@ -56,10 +102,110 @@ void Game::Tick()
 // Updates the world.
 void Game::Update(DX::StepTimer const& timer)
 {
-    float elapsedTime = float(timer.GetElapsedSeconds());
 
-    // TODO: Add your game logic here
-    elapsedTime;
+
+	float elapsedTime = float(timer.GetElapsedSeconds());
+
+	// TODO: Add your game logic here
+	elapsedTime;
+
+	Attack = false;
+	Difence = false;
+
+	auto state = gamepad->GetState(0);
+
+	
+
+	if (state.IsConnected())
+	{
+		state = gamepad->GetState(0);
+
+		tracker.Update(state);
+
+
+
+		if (state.IsAPressed())
+		{
+			// Do action for button A being down
+			switch (ModeFlag)
+			{
+			case 0:
+				Attack = true;
+				break;
+
+			case 1:
+				Difence = true;
+				break;
+			}
+			
+		}
+
+		if (state.IsBPressed())
+		{
+			switch (ModeFlag)
+			{
+			case 0:
+				Difence = true;
+				break;
+
+			case 1:
+				
+				Attack = true;
+				break;
+			}
+		}
+
+
+		if (state.buttons.y) {
+			// Do action for button Y being down
+			
+		}
+		if (state.IsDPadLeftPressed()) {
+			// Do action for DPAD Left being down
+		}
+
+		if (state.dpad.up || state.dpad.down || state.dpad.left || state.dpad.right) {
+			// Do action based on any DPAD change
+
+			float posx = state.thumbSticks.leftX;
+			float posy = state.thumbSticks.leftY;
+			// These values are normalized to -1 to 1
+
+			float throttle = state.triggers.right;
+			// This value is normalized 0 -> 1
+		}
+		if (state.IsLeftTriggerPressed()) {
+			// Do action based on a left trigger pressed more than halfway
+		}
+		
+
+		using ButtonState = GamePad::ButtonStateTracker::ButtonState;
+
+		if (tracker.back == GamePad::ButtonStateTracker::PRESSED)
+		{
+			// Take an action when Button A is first pressed, but don't do it again until
+			switch (ModeFlag)
+			{
+			case 0:
+					ModeFlag = 1;
+					break;
+			case 1:
+				ModeFlag = 0;
+				break;
+			}
+			// the button is released and then pressed again
+		}
+	
+
+
+
+
+		
+	}
+	
+
+	state = gamepad->GetState(0, GamePad::DEAD_ZONE_CIRCULAR);
+
 }
 
 // Draws the scene.
@@ -76,11 +222,51 @@ void Game::Render()
     // TODO: Add your rendering code here.
 
 	m_spriteBatch->Begin();
-	m_spriteFont->DrawString(m_spriteBatch.get(),
-		L"Hello, world!", XMFLOAT2(100, 100));
+
+	
+
+	
+
+
+
+	if (Difence) {
+		m_spriteFont->DrawString(m_spriteBatch.get(),
+			L"Difence", XMFLOAT2(100, 150));
+
+		m_spriteBatch->Draw(m_texture2.Get(), SimpleMath::Vector2(200,200));
+
+	}
+
+
+	if (Attack) {
+		m_spriteFont->DrawString(m_spriteBatch.get(),
+			L"Attack", XMFLOAT2(100, 100));
+
+
+		m_spriteBatch->Draw(m_texture1.Get(), SimpleMath::Vector2(290, 300));
+
+
+	}
+
+	switch (ModeFlag)
+	{
+	case 0:
+		
+		m_spriteFont->DrawString(m_spriteBatch.get(),
+			L"Mode1", XMFLOAT2(100, 50));
+		break;
+	case 1:
+		
+		m_spriteFont->DrawString(m_spriteBatch.get(),
+			L"Mode2", XMFLOAT2(100, 50));
+		break;
+	}
+
+
+
 	m_spriteBatch->End();
 
-
+	
 
     Present();
 }

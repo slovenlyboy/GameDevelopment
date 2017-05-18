@@ -8,6 +8,12 @@
 #include <SpriteFont.h>
 #include <SpriteBatch.h>
 #include <SStream>
+#include "CueSheet_0.h"
+#include <GamePad.h>
+#include"JoyPad.h"
+
+
+
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
@@ -67,7 +73,32 @@ private:
 
 	//スプライトバッチ
 	std::unique_ptr<DirectX::SpriteBatch> m_spriteBatch;
+	
 	//スプライトフォント
 	std::unique_ptr<DirectX::SpriteFont> m_spriteFont;
+
+
+	std::unique_ptr<DirectX::GamePad> gamepad;
+
+	DirectX::GamePad::ButtonStateTracker tracker;
+
+
+	//え
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_texture1;
+
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_texture2;
+
+
+
+	std::unique_ptr<JoyPad> m_pJoyPad;
+
+
+	int ModeFlag = 0;
+
+	bool Attack = false;
+	bool Difence = false;
+
+	
+
 
 };
